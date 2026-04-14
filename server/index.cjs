@@ -9,19 +9,21 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (Postman, mobile apps, etc.)
+    const allowedOrigins = [
+      'http://localhost:5174', // ✅ ADD THIS
+      'http://127.0.0.1:5174', // optional
+      'https://destination-wedding-crm.netlify.app'
+    ];
+
+    // Allow Postman / server requests
     if (!origin) return callback(null, true);
 
-    // Allow all netlify.app domains
+    // Allow Netlify
     if (origin.endsWith('.netlify.app')) {
       return callback(null, true);
     }
 
-    // Optional: also allow your env-based URLs
-    const allowedOrigins = process.env.FRONTEND_URL
-      ? process.env.FRONTEND_URL.split(',')
-      : [];
-
+    // Allow localhost + specific domains
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
