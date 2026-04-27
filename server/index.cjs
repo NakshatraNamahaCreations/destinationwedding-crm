@@ -57,14 +57,15 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB Atlas');
 
-    // Seed default destinations if empty
+    // Ensure default destinations exist (adds any missing, never deletes)
     const Destination = require('./models/Destination.cjs');
-    Destination.countDocuments().then(count => {
-      if (count === 0) {
-        const defaults = ['Goa', 'Udaipur', 'Jaipur', 'Kerala', 'Jim Corbett', 'Mussoorie', 'Thailand', 'Bali', 'Maldives', 'Dubai'];
-        Destination.insertMany(defaults.map(name => ({ name })));
-        console.log('Seeded default destinations');
-      }
+    const defaults = ['Goa', 'Udaipur', 'Jaipur', 'Kerala', 'Jim Corbett', 'Mussoorie', 'Thailand', 'Bali', 'Maldives', 'Dubai'];
+    Destination.bulkWrite(
+      defaults.map(name => ({
+        updateOne: { filter: { name }, update: { $setOnInsert: { name } }, upsert: true },
+      }))
+    ).then(result => {
+      if (result.upsertedCount > 0) console.log(`Seeded ${result.upsertedCount} destinations`);
     });
 
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
