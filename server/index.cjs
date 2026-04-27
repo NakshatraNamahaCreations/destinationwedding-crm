@@ -1,3 +1,5 @@
+require('dns').setServers(['8.8.8.8', '1.1.1.1']);
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -10,8 +12,15 @@ const app = express();
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'http://localhost:5174', // ✅ ADD THIS
-      'http://127.0.0.1:5174', // optional
+      // CRM (admin) dev
+      'http://localhost:5174',
+      'http://127.0.0.1:5174',
+      // Public marketing site dev (Vite default + alternates)
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      // Production
       'https://destination-wedding-crm.netlify.app'
     ];
 

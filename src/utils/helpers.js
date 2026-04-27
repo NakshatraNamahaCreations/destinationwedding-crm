@@ -8,12 +8,27 @@ export function formatCurrency(amount) {
 export function formatBudgetRange(amount) {
   const n = Number(amount);
   if (!n) return '-';
+  // CRM admin form preset values
   if (n === 1000000) return 'Below 10 Lakhs';
   if (n === 1500000) return '10 - 15 Lakhs';
   if (n === 2500000) return '15 - 25 Lakhs';
   if (n === 3500000) return '25 - 35 Lakhs';
   if (n === 5000000) return '35 - 50 Lakhs';
   if (n === 5000001) return 'Above 50 Lakhs';
+  // Public site - ContactUs form
+  if (n === 750000) return '₹5L – ₹10L';
+  if (n === 1500001) return '₹10L – ₹20L';
+  if (n === 3000000) return '₹20L – ₹40L';
+  if (n === 5750000) return '₹40L – ₹75L';
+  if (n === 7500000) return '₹75L+';
+  // Public site - Wedding popup form
+  if (n === 1750000) return '₹10L – ₹25L';
+  if (n === 3750000) return '₹25L – ₹50L';
+  if (n === 5500000) return '₹50L+';
+  // Public site - Header "Plan my wedding" form
+  if (n === 2000000) return '₹15L – ₹25L';
+  if (n === 3250000) return '₹25L – ₹40L';
+  if (n === 4000001) return '₹40L+';
   return formatCurrency(n);
 }
 

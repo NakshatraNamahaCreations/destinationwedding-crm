@@ -24,20 +24,34 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create enquiry
+async function nextEnquiryId() {
+  const last = await Enquiry.findOne({ enquiryId: /^ENQ-?\d+$/ })
+    .sort({ enquiryId: -1 })
+    .select('enquiryId')
+    .lean();
+  const maxNum = last ? parseInt(String(last.enquiryId).replace(/\D/g, ''), 10) || 0 : 0;
+  return maxNum + 1;
+}
+
 router.post('/', async (req, res) => {
-  try {
-    const count = await Enquiry.countDocuments();
-    const enquiryId = `ENQ-${String(count + 1).padStart(3, '0')}`;
-    const enquiry = new Enquiry({
-      ...req.body,
-      enquiryId,
-      status: 'New',
-      activities: [{ type: 'created', description: 'Enquiry created', timestamp: new Date() }],
-    });
-    await enquiry.save();
-    res.status(201).json(enquiry);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+  const { followUps, activities, enquiryId: _ignoreId, status: _ignoreStatus, ...rest } = req.body;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const next = (await nextEnquiryId()) + attempt;
+      const enquiryId = `ENQ-${String(next).padStart(3, '0')}`;
+      const enquiry = new Enquiry({
+        ...rest,
+        enquiryId,
+        status: 'New',
+        followUps: [],
+        activities: [{ type: 'created', description: 'Enquiry created', timestamp: new Date() }],
+      });
+      await enquiry.save();
+      return res.status(201).json(enquiry);
+    } catch (err) {
+      if (err && err.code === 11000 && attempt < 4) continue;
+      return res.status(400).json({ error: err.message });
+    }
   }
 });
 
