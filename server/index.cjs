@@ -21,7 +21,9 @@ app.use(cors({
       'http://localhost:3000',
       'http://127.0.0.1:3000',
       // Production
-      'https://destination-wedding-crm.netlify.app'
+      'https://destination-wedding-crm.netlify.app',
+      'https://destinationweddingcompany.in',
+      'https://www.destinationweddingcompany.in'
     ];
 
     // Allow Postman / server requests
@@ -29,6 +31,11 @@ app.use(cors({
 
     // Allow Netlify
     if (origin.endsWith('.netlify.app')) {
+      return callback(null, true);
+    }
+
+    // Allow the production marketing domain (apex + any subdomain)
+    if (origin === 'https://destinationweddingcompany.in' || origin.endsWith('.destinationweddingcompany.in')) {
       return callback(null, true);
     }
 

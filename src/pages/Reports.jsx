@@ -27,6 +27,27 @@ export default function Reports() {
     return result;
   }, [enquiries, search, typeFilter, sortBy]);
 
+  const handleExportCSV = () => {
+    const escape = (v) => {
+      const s = v == null ? '' : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = ['ID', 'Couple Name', 'Phone', 'Source', 'Est Budget', 'Destination', 'Created Date', 'Status'];
+    const rows = filtered.map(e => [
+      e.id, e.coupleName, e.phone, e.leadSource || '', formatBudgetRange(e.estimatedBudget), e.destination || '', formatDate(e.createdAt), e.status,
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(escape).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `enquiry-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const selectClass = "px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 focus:ring-2 focus:ring-[#8B1A1A]/20 focus:border-[#8B1A1A] outline-none min-w-[120px]";
 
   return (
@@ -40,7 +61,7 @@ export default function Reports() {
           <h1 className="text-xl font-bold text-gray-900">ENQUIRY REPORT</h1>
           <p className="text-xs text-gray-500 mt-0.5">Manage all payments in one place</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition-colors">
+        <button onClick={handleExportCSV} disabled={filtered.length === 0} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <Download className="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>

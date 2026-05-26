@@ -18,7 +18,7 @@ const workspaceItems = [
 const reportItems = [
   { to: '/payments', icon: CreditCard, label: 'Payments Report' },
   { to: '/reports', icon: FileText, label: 'Enquiry Report' },
-  { to: '/budget', icon: BarChart3, label: 'Budget Report' },
+  // { to: '/budget', icon: BarChart3, label: 'Budget Report' },
 ];
 
 

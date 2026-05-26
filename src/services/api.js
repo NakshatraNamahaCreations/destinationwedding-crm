@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'https://destinationwedding-crm.onrender.com';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://destinationwedding-crm-bzx1.onrender.com';
 
 async function request(url, options = {}) {
   const res = await fetch(`${API_BASE}${url}`, {

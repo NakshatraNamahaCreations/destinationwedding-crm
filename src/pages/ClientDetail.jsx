@@ -190,7 +190,7 @@ export default function ClientDetail() {
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-400">Booking Date</p>
-                  <p className="text-xs font-medium text-gray-900 mt-0.5">{formatDate(client.convertedAt)}</p>
+                  <p className="text-xs font-medium text-gray-900 mt-0.5">{formatDate(client.createdAt)}</p>
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-400">Booking Status</p>

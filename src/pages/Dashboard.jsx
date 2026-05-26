@@ -19,7 +19,10 @@ export default function Dashboard() {
 
   const activeClientsList = clients.filter(c => c.status !== 'Completed');
   const upcomingWeddings = clients
-    .filter(c => daysUntil(c.weddingDate) >= 0 && daysUntil(c.weddingDate) <= 90)
+    .filter(c => {
+      const days = daysUntil(c.weddingDate);
+      return days !== null && days >= 0 && c.status !== 'Completed';
+    })
     .sort((a, b) => new Date(a.weddingDate) - new Date(b.weddingDate));
   const recentEnquiries = [...enquiries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
 

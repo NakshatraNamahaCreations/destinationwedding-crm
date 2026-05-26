@@ -379,8 +379,12 @@ export default function EnquiryList() {
       if (hasFollowUps) return false; // Move to Follow-ups page
       const matchSearch = !search || e.coupleName.toLowerCase().includes(search.toLowerCase()) || e.phone.includes(search) || e.id.toLowerCase().includes(search.toLowerCase());
       const matchStatus = !statusFilter || e.status === statusFilter;
-      const matchSource = !sourceFilter || e.leadSource === sourceFilter;
-      const matchDest = !destFilter || e.destination === destFilter;
+      const src = (e.leadSource || '').trim().toLowerCase();
+      const srcFilter = sourceFilter.trim().toLowerCase();
+      const matchSource = !srcFilter || src === srcFilter || src.startsWith(srcFilter + ' -') || src.startsWith(srcFilter + '-');
+      const dest = (e.destination || '').trim().toLowerCase();
+      const dFilter = destFilter.trim().toLowerCase();
+      const matchDest = !dFilter || dest === dFilter;
       return matchSearch && matchStatus && matchSource && matchDest;
     });
     if (dateFilter === 'today') {

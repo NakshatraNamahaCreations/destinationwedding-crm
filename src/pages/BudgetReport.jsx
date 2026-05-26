@@ -22,6 +22,27 @@ export default function BudgetReport() {
     })).sort((a, b) => b.budget - a.budget);
   }, [clients]);
 
+  const handleExportCSV = () => {
+    const escape = (v) => {
+      const s = v == null ? '' : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = ['SL No', 'Client ID', 'Couple Name', 'Destination', 'Total Budget', 'Collected', 'Pending', 'Progress %'];
+    const rows = clientBudgets.map((c, idx) => [
+      idx + 1, c.id, c.coupleName, c.destination || '', c.budget || 0, c.paid || 0, c.pending || 0, c.progress,
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(escape).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `budget-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-5">
       <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 font-medium">
@@ -33,7 +54,7 @@ export default function BudgetReport() {
           <h1 className="text-xl font-bold text-gray-900">BUDGET REPORT</h1>
           <p className="text-xs text-gray-500 mt-0.5">Track budget allocation and collection across all clients</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition-colors">
+        <button onClick={handleExportCSV} disabled={clientBudgets.length === 0} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 pointer-cursor">
           <Download className="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>

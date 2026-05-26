@@ -62,6 +62,27 @@ export default function Payments() {
     return payments;
   }, [clients, search, methodFilter, sortBy]);
 
+  const handleExportCSV = () => {
+    const escape = (v) => {
+      const s = v == null ? '' : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = ['SL No', 'Client ID', 'Client Name', 'Phone', 'Bill Ref', 'Method', 'Amount', 'Date', 'Note'];
+    const rows = allPayments.map((p, idx) => [
+      idx + 1, p.clientId, p.clientName, p.clientPhone || '', p.billRef, p.method, p.amount, p.date, p.note || '',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(escape).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `payments-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const selectClass = "px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 focus:ring-2 focus:ring-[#8B1A1A]/20 focus:border-[#8B1A1A] outline-none min-w-[120px]";
 
   return (
@@ -75,7 +96,7 @@ export default function Payments() {
           <h1 className="text-xl font-bold text-gray-900">PAYMENTS REPORT</h1>
           <p className="text-xs text-gray-500 mt-0.5">Manage all payments in one place</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition-colors">
+        <button onClick={handleExportCSV} disabled={allPayments.length === 0} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <Download className="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>
